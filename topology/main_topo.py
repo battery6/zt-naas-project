@@ -99,11 +99,9 @@ def configure_network(net):
 
     h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'http_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_http.log')} 2>&1 &")
     h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'https_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_https.log')} 2>&1 &")
-    h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'ssh_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_ssh.log')} 2>&1 &")
     h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'ssh_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_ssh.log')} 2>&1 &")
     h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'db_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_server.log')} 2>&1 &")
-    h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'db_tls_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_tls.log')} 2>&1 &")
-
+  
     # Distribute certificates
     # Distribute certificates (use repo-relative path)
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
