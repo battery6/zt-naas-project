@@ -3,6 +3,7 @@ import subprocess
 import json
 import csv
 import math
+import requests
 
 #############################################
 #      HELPER FUNCTIONS                     #
@@ -35,10 +36,12 @@ def change_policy_level(level):
         Args:
             level (int): policy level after change
     """
-    subprocess.run([
-        "curl", "-X", "POST",
-        f"http://127.0.0.1:8080/policy/level/{level}"
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        resp = requests.post(f"http://127.0.0.1:8080/policy/level/{level}", timeout=2)
+        resp.raise_for_status()
+    except Exception:
+        # best-effort call; tests will detect incorrect state later
+        pass
 
 def authenticate_entity(name):
     """ Authenticate entity function
@@ -47,11 +50,17 @@ def authenticate_entity(name):
         Args:
             name (string): entity name
     """
-    subprocess.run([
-        "curl", "-k", "-X", "POST", "https://127.0.0.1:5000/login",
-        "-H", "Content-Type: application/json",
-        "-d", f'{{"username":"{name}","password":"pass123"}}'
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        resp = requests.post(
+            "https://127.0.0.1:5000/login",
+            json={"username": name, "password": "pass123"},
+            timeout=2,
+            verify=False,
+        )
+        resp.raise_for_status()
+    except Exception:
+        # Authentication best-effort for experiments; failures are handled in tests
+        pass
 
 def update_attribute(ip, data):
     """ Update attribute function
@@ -62,12 +71,15 @@ def update_attribute(ip, data):
             data (json): attribute data
     """
 
-    result = subprocess.run([
-        "curl", "-s", "-X", "POST",
-        f"http://127.0.0.1:8080/hosts/{ip}/attributes",
-        "-H", "Content-Type: application/json",
-        "-d", json.dumps(data)
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        resp = requests.post(
+            f"http://127.0.0.1:8080/hosts/{ip}/attributes",
+            json=data,
+            timeout=2,
+        )
+        resp.raise_for_status()
+    except Exception:
+        pass
 
 def update_flow(src, dst, port, action):
     """ Update flow function
@@ -80,27 +92,27 @@ def update_flow(src, dst, port, action):
             action (string): allow/deny
     """
 
-    result = subprocess.run([
-        "curl", "-X", "POST",
-        "http://127.0.0.1:8080/policy/flows",
-        "-H", "Content-Type: application/json",
-        "-d", json.dumps({
-            "src_ip": src,
-            "dst_ip": dst,
-            "dst_port": port,
-            "action": action
-        })
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        payload = {"src_ip": src, "dst_ip": dst, "dst_port": port, "action": action}
+        resp = requests.post(
+            "http://127.0.0.1:8080/policy/flows",
+            json=payload,
+            timeout=2,
+        )
+        resp.raise_for_status()
+    except Exception:
+        pass
 
 def reset_controller_state():
     """ Reset controller state function
             Calls API to reset controller state
     """
 
-    result = subprocess.run([
-        "curl", "-X", "POST",
-        "http://127.0.0.1:8080/reset"
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        resp = requests.post("http://127.0.0.1:8080/reset", timeout=2)
+        resp.raise_for_status()
+    except Exception:
+        pass
 
 # Define fields for summary output functions
 SUMMARY_FIELDS = {

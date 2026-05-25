@@ -1,5 +1,6 @@
 import sys
 import time
+import os
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.node import Controller, RemoteController, OVSKernelSwitch
@@ -91,16 +92,23 @@ def configure_network(net):
     h7guest.cmd('ip route add default via 10.0.4.1')
 
     # Start servers
-    h5appserv.cmd('python3 /home/philip/zt-naas-project/services/http_server.py > /home/philip/zt-naas-project/logs/h4_app.log 2>&1 &')
-    h5appserv.cmd('python3 /home/philip/zt-naas-project/services/https_server.py > /home/philip/zt-naas-project/logs/h4_app.log 2>&1 &')
-    h5appserv.cmd('python3 /home/philip/zt-naas-project/services/ssh_server.py > /home/philip/zt-naas-project/logs/h4_app.log 2>&1 &')
-    h6dbserv.cmd('python3 /home/philip/zt-naas-project/services/ssh_server.py > /home/philip/zt-naas-project/logs/h5_db.log 2>&1 &')
-    h6dbserv.cmd('python3 /home/philip/zt-naas-project/services/db_server.py > /home/philip/zt-naas-project/logs/h5_db.log 2>&1 &')
-    h6dbserv.cmd('python3 /home/philip/zt-naas-project/services/db_tls_server.py > /home/philip/zt-naas-project/logs/h5_db.log 2>&1 &')
+    # Use repo-relative paths for services and logs so the topology runs on any machine
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    LOGS_DIR = os.path.join(BASE_DIR, "logs")
+    os.makedirs(LOGS_DIR, exist_ok=True)
+
+    h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'http_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_http.log')} 2>&1 &")
+    h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'https_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_https.log')} 2>&1 &")
+    h5appserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'ssh_server.py')} > {os.path.join(LOGS_DIR, 'h5_app_ssh.log')} 2>&1 &")
+    h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'ssh_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_ssh.log')} 2>&1 &")
+    h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'db_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_server.log')} 2>&1 &")
+    h6dbserv.cmd(f"python3 {os.path.join(BASE_DIR, 'services', 'db_tls_server.py')} > {os.path.join(LOGS_DIR, 'h6_db_tls.log')} 2>&1 &")
 
     # Distribute certificates
-    h1user.cmd("cp /home/philip/zt-naas-project/certs/ca.crt /tmp/ca.crt")
-    h4admin.cmd("cp /home/philip/zt-naas-project/certs/ca.crt /tmp/ca.crt")
+    # Distribute certificates (use repo-relative path)
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    h1user.cmd(f"cp {os.path.join(BASE_DIR, 'certs', 'ca.crt')} /tmp/ca.crt")
+    h4admin.cmd(f"cp {os.path.join(BASE_DIR, 'certs', 'ca.crt')} /tmp/ca.crt")
 
 def wait_for_servers(net):
     h5 = net.get("h5appserv")
