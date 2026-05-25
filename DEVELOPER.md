@@ -55,6 +55,24 @@ python3 experiments/experiments.py --experiment architecture
 - Enhance `experiments/experiments.py` process startup functions to poll `controller.poll()` and `auth.poll()` or inspect the created log for a known success pattern, and fail early if the process crashes.
 - Add unit tests (pytest) for `core/policy/policy_engine.py` and `core/sessions/sessions.py` covering key policy levels and session lifecycle behaviors.
 
+Updates applied in this branch
+- `topology/main_topo.py` now uses `BASE_DIR` and writes per-service log files into `logs/` (created if missing). This removes absolute `/home/...` paths used previously.
+- `experiments/utils/helpers.py` now uses `requests` instead of shell `curl` calls and includes timeouts. This improves portability and error handling.
+
+Running the convenience script `scripts/run_system.sh`
+- `scripts/run_system.sh` is a convenience script that assumes the repository is located at `~/zt-naas-project`. You can run it as-is on a Linux machine that has the repo at that path. To avoid editing the script you can create a temporary symlink to the repo from your home directory:
+```bash
+ln -s "$(pwd)" ~/zt-naas-project
+bash scripts/run_system.sh 1
+rm ~/zt-naas-project
+```
+- Alternatively edit `scripts/run_system.sh` and replace the hard-coded `~/zt-naas-project` path with `$(pwd)` or the explicit absolute path to this repo on your machine.
+
+Recommended follow-ups (I can implement these):
+- Add `requirements.txt` with `flask`, `requests`, `ryu` and document Mininet installation.
+- Make `experiments/experiments.py` validate process startup and fail early if controller/auth service dies.
+- Add a small CI job to run fast unit tests (no Mininet required) to catch regressions.
+
 7) Suggested small checklist before running full experiments
 - Ensure `logs/` folder exists and is writable by the user running Mininet and the controller.
 - Confirm `ryu-manager` is installed and in PATH.

@@ -1,0 +1,11 @@
+# Core Python dependencies for the ZT-NaaS experiments and services
+flask
+requests
+ryu
+
+# Dev / test dependencies
+pytest
+
+# Note: Mininet and Open vSwitch are system packages and should be installed
+# via your OS package manager or Mininet's install script (they are not
+# reliably pip-installable on all platforms).

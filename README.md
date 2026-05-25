@@ -30,6 +30,33 @@ ZT_POLICY_LEVEL=1 ryu-manager core/zt_controller.py
 python3 experiments/experiments.py --experiment architecture
 ```
 
+Changes made in this branch
+- `topology/main_topo.py` now uses repository-relative paths and creates a `logs/` directory under the repo root. Service processes started inside Mininet write to per-service log files (for example `logs/h5_app_http.log`). This removes hard-coded absolute paths and improves portability.
+- `experiments/utils/helpers.py` now uses Python `requests` (with short timeouts and response checks) instead of shell `curl` subprocess calls. This makes experiments portable to environments without `curl` and easier to debug.
+
+Run `scripts/run_system.sh` (convenience script)
+- `scripts/run_system.sh` is a helper meant for Linux environments; by default it expects the repository to be available at `~/zt-naas-project` because it uses that path in several places. You have two options to use it safely:
+  - Quick (no edit): create a symlink from your home directory so the script finds the expected path:
+    ```bash
+    ln -s "$(pwd)" ~/zt-naas-project
+    bash scripts/run_system.sh 1   # Run with a policy level (0..3)
+    # When finished remove the symlink
+    rm ~/zt-naas-project
+    ```
+  - Edit the script: open `scripts/run_system.sh` and replace `~/zt-naas-project` with the absolute path to your local repo, or change it to use `$(pwd)`/repo-root detection.
+
+If you prefer not to use `run_system.sh`, run the steps manually (recommended for WSL):
+```bash
+# Start auth service
+python3 services/auth_service.py &
+
+# Start the controller with a chosen policy level
+ZT_POLICY_LEVEL=2 ryu-manager core/zt_controller.py &
+
+# Start Mininet topology (from a Linux host with Mininet installed)
+sudo python3 topology/main_topo.py
+```
+
 Useful API examples
 - Get current policy level:
 ```
