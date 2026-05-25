@@ -150,6 +150,17 @@ class PolicyEngine:
         if policy["attribute_based_access"]:
             live_attributes = self.auth_client.get_live_attributes(src)
 
+            self.logger.info(
+                "LIVE ATTRIBUTES src=%s attrs=%s",
+                src,
+                live_attributes
+            )
+
+            self.logger.info(
+                "MERGED SRC INFO %s",
+                src_info
+            )
+
             src_info = {
                 **src_info,
                 **live_attributes

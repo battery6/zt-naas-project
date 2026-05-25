@@ -52,39 +52,6 @@ ARCHITECTURE_TESTS = [
 
 PORT_POLICY_TESTS = [
     {
-        "name": "h1user_app_tcp_80",
-        "src": "h1user",
-        "dst": "h5appserv",
-        "protocol": "tcp",
-        "port": 80,
-        "traffic_type": "insecure channel",
-        "legitimate": False,
-        "expected_by_level": {
-            0: "allow",
-            1: "allow",
-            2: "allow",
-            3: "allow",
-            4: "deny",
-        },
-    },
-    {
-        "name": "h1user_app_tcp_443",
-        "src": "h1user",
-        "dst": "h5appserv",
-        "protocol": "tcp",
-        "port": 443,
-        "traffic_type": "secure channel",
-        "legitimate": True,
-        "expected_by_level": {
-            0: "allow",
-            1: "allow",
-            2: "allow",
-            3: "allow",
-            4: "allow",
-        },
-    },
-
-    {
         "name": "h1user_app_http",
         "src": "h1user",
         "dst": "h5appserv",
@@ -123,22 +90,6 @@ PORT_POLICY_TESTS = [
         "protocol": "tcp",
         "port": 5432,
         "traffic_type": "unauthorized segment",
-        "legitimate": False,
-        "expected_by_level": {
-            0: "allow",
-            1: "deny",
-            2: "deny",
-            3: "deny",
-            4: "deny",
-        },
-    },
-    {
-        "name": "h1user_db_tcp_443",
-        "src": "h1user",
-        "dst": "h6dbserv",
-        "protocol": "tcp",
-        "port": 443,
-        "traffic_type": "secure channel",
         "legitimate": False,
         "expected_by_level": {
             0: "allow",
@@ -213,6 +164,22 @@ PORT_POLICY_TESTS = [
         },
     },
     {
+        "name": "guest_db_tcp",
+        "src": "h7guest",
+        "dst": "h6dbserv",
+        "protocol": "tcp",
+        "port": 5432,
+        "traffic_type": "guest isolation",
+        "legitimate": False,
+        "expected_by_level": {
+            0: "allow",
+            1: "deny",
+            2: "deny",
+            3: "deny",
+            4: "deny",
+        },
+    },
+    {
         "name": "app_db_tcp_5432",
         "src": "h5appserv",
         "dst": "h6dbserv",
@@ -237,7 +204,7 @@ PERFORMANCE_TESTS = [
         "dst": "h5appserv",
         "protocol": "icmp",
         "traffic_type": "ping performance",
-        "legitimate": True,
+        "legitimate": False,
         "expected_by_level": {
             0: "allow",
             1: "allow",
@@ -248,7 +215,7 @@ PERFORMANCE_TESTS = [
         "runs": 10
  },
     {
-        "name": "perf_user_app_https_tcp",
+        "name": "perf_user_app_tcp",
         "src": "h1user",
         "dst": "h5appserv",
         "protocol": "tcp",
@@ -298,6 +265,40 @@ PERFORMANCE_TESTS = [
         },
         "runs": 10
     },
+    {
+        "name": "perf_guest_app_blocked_tcp",
+        "src": "h7guest",
+        "dst": "h5appserv",
+        "protocol": "tcp",
+        "port": 443,
+        "traffic_type": "blocked tcp performance",
+        "legitimate": False,
+        "expected_by_level": {
+            0: "allow",
+            1: "deny",
+            2: "deny",
+            3: "deny",
+            4: "deny",
+        },
+        "runs": 10
+    },
+    {
+        "name": "perf_app_db_tcp",
+        "src": "h5appserv",
+        "dst": "h6dbserv",
+        "protocol": "tcp",
+        "port": 5432,
+        "traffic_type": "backend tcp performance",
+        "legitimate": True,
+        "expected_by_level": {
+            0: "allow",
+            1: "allow",
+            2: "allow",
+            3: "allow",
+            4: "allow",
+        },
+        "runs": 10
+    }
 ]
 
 DYNAMIC_TESTS = [
@@ -339,106 +340,20 @@ DYNAMIC_TESTS = [
         "expected_before": "allow",
         "expected_after": "deny",
         "traffic_type": "legitimate"
+    },
+    {
+        "name": "dynamic_policy_level_change",
+        "type": "dynamic_level",
+        "level": 1,
+        "new_level": 4,
+        "src": "h1user",
+        "dst": "h5appserv",
+        "protocol": "http",
+        "port": 80,
+        "traffic_type": "dynamic policy level",
+        "expected_before": "allow",
+        "expected_after": "deny"
     }
-]
-
-ISOLATION_TESTS = [
-    {
-        "name": "isolation_user_app_allowed",
-        "src": "h1user",
-        "dst": "h5appserv",
-        "protocol": "tcp",
-        "port": 443,
-        "traffic_type": "open channel",
-        "legitimate": True,
-        "expected_by_level": {
-            0: "allow",
-            1: "allow",
-            2: "allow",
-            3: "allow",
-            4: "allow",
-        },
-    },
-    {
-        "name": "isolation_user_db_blocked",
-        "src": "h1user",
-        "dst": "h6dbserv",
-        "protocol": "tcp",
-        "port": 5432,
-        "traffic_type": "closed channel",
-        "legitimate": False,
-        "expected_by_level": {
-            0: "allow",
-            1: "deny",
-            2: "deny",
-            3: "deny",
-            4: "deny",
-        },
-    },
-    {
-        "name": "isolation_guest_app_blocked",
-        "src": "h7guest",
-        "dst": "h5appserv",
-        "protocol": "tcp",
-        "port": 443,
-        "traffic_type": "closed channel",
-        "legitimate": False,
-        "expected_by_level": {
-            0: "allow",
-            1: "deny",
-            2: "deny",
-            3: "deny",
-            4: "deny",
-        },
-    },
-    {
-        "name": "isolation_guest_db_blocked",
-        "src": "h7guest",
-        "dst": "h6dbserv",
-        "protocol": "tcp",
-        "port": 5432,
-        "traffic_type": "closed channel",
-        "legitimate": False,
-        "expected_by_level": {
-            0: "allow",
-            1: "deny",
-            2: "deny",
-            3: "deny",
-            4: "deny",
-        },
-    },
-    {
-        "name": "isolation_admin_db_allowed",
-        "src": "h4admin",
-        "dst": "h6dbserv",
-        "protocol": "tcp",
-        "port": 5432,
-        "traffic_type": "open channel",
-        "legitimate": True,
-        "expected_by_level": {
-            0: "allow",
-            1: "allow",
-            2: "allow",
-            3: "allow",
-            4: "allow",
-        },
-    },
-    {
-        "name": "isolation_app_db_allowed",
-        "src": "h5appserv",
-        "dst": "h6dbserv",
-        "protocol": "tcp",
-        "port": 5432,
-        "traffic_type": "open channel",
-        "legitimate": True,
-        "expected_by_level": {
-            0: "allow",
-            1: "allow",
-            2: "allow",
-            3: "allow",
-            4: "allow",
-        },
-    },
 ]
 
 ATTACK_TESTS = [
@@ -507,6 +422,22 @@ ATTACK_TESTS = [
             2: "allow",
             3: "deny",
             4: "deny",
+        },
+    },
+    {
+    "name": "attack_authenticated_user_unapproved_port",
+    "src": "h1user",
+    "dst": "h5appserv",
+    "protocol": "tcp",
+    "port": 80,
+    "traffic_type": "microsegmentation_unapproved_flow",
+    "legitimate": False,
+    "expected_by_level": {
+        0: "allow",
+        1: "allow",
+        2: "allow",
+        3: "allow",
+        4: "deny",
         },
     },
 ]

@@ -235,10 +235,12 @@ class ZeroTrustController(app_manager.RyuApp):
         if allowed:
             self.logger.info("ALLOW ICMP %s -> %s", src, dst)
             self.flow_manager.install_allow_flow(datapath, match, out_port)
+            self.logger.info("FLOW INSTALLED %s", match)
             self.flow_manager.forward_packet(datapath, msg, in_port, out_port)
         else:
             self.logger.info("DROP ICMP %s -> %s", src, dst)
             self.flow_manager.drop_flow(datapath, match)
+            self.logger.info("FLOW DROPPED %s", match)
 
     def handle_tcp(self, datapath, msg, in_port, out_port, eth, ip_pkt, tcp_pkt):
         """ Handles tcp packets
@@ -302,11 +304,13 @@ class ZeroTrustController(app_manager.RyuApp):
         if allowed:
             self.logger.info("ALLOW TCP %s -> %s:%s", src, dst, dst_port)
             self.flow_manager.install_allow_flow(datapath, match, out_port)
+            self.logger.info("FLOW INSTALLED match: %s", match)
             self.flow_manager.forward_packet(datapath, msg, in_port, out_port)
         # Deny
         else:
             self.logger.info("DROP TCP %s -> %s:%s", src, dst, dst_port)
             self.flow_manager.drop_flow(datapath, match)
+            self.logger.info("FLOW DROPPED match %s", match)
 
     # Set policy level function
     def set_policy_level(self, level):

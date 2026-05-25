@@ -201,7 +201,7 @@ class PolicyAPIController(ControllerBase):
             )
 
         success, message, updated = (
-            self.zt_controller.update_host_attributes(ip, data)
+            self.zt_controller.auth_client.update_host_attributes(ip, data)
         )
 
         return self.json_response({

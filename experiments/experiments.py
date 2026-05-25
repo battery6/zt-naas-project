@@ -41,7 +41,6 @@ from tests.test_definitions import (
     PORT_POLICY_TESTS,
     PERFORMANCE_TESTS,
     DYNAMIC_TESTS,
-    ISOLATION_TESTS,
     ATTACK_TESTS
 )
 from tests.ping_test import run_ping_test
@@ -58,7 +57,6 @@ TEST_SETS = {
     "ports": PORT_POLICY_TESTS,
     "performance": PERFORMANCE_TESTS,
     "dynamic": DYNAMIC_TESTS,
-    "isolation": ISOLATION_TESTS,
     "attack": ATTACK_TESTS,
 }
 
@@ -307,7 +305,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--experiment",
-        choices=["architecture", "ports", "performance", "dynamic", "isolation", "attack"],
+        choices=["architecture", "ports", "performance", "dynamic", "attack"],
         default="architecture"
     )
 

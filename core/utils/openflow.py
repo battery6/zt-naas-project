@@ -115,17 +115,17 @@ class FlowManager:
 
     # --- Forward packet function (arp) ---
     def forward_packet(self, datapath, msg, in_port, out_port):
-       """ Forward one packet without installing flow rule
-               Used for ARP
+        """ Forward one packet without installing flow rule
+                Used for ARP
 
-           Args:
-               datapath (ryu object): switch OpenFlow connection
-               msg (ryu message):
-               in_port (int): incoming packet
-               out_port (int): outgoing packet
-       """
+            Args:
+                datapath (ryu object): switch OpenFlow connection
+                msg (ryu message):
+                in_port (int): incoming packet
+                out_port (int): outgoing packet
+        """
 
-       parser = datapath.ofproto_parser
+        parser = datapath.ofproto_parser
 
         actions = [parser.OFPActionOutput(out_port)]
 
