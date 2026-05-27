@@ -132,6 +132,22 @@ PORT_POLICY_TESTS = [
         },
     },
     {
+        "name": "admin_app_https",
+        "src": "h4admin",
+        "dst": "h5appserv",
+        "protocol": "https",
+        "port": 443,
+        "traffic_type": "normal use",
+        "legitimate": True,
+        "expected_by_level": {
+            0: "allow",
+            1: "allow",
+            2: "allow",
+            3: "allow",
+            4: "allow",
+        },
+    },
+    {
         "name": "admin_db_tcp_22",
         "src": "h4admin",
         "dst": "h6dbserv",
@@ -298,7 +314,7 @@ PERFORMANCE_TESTS = [
             4: "allow",
         },
         "runs": 10
-    }
+    },
 ]
 
 DYNAMIC_TESTS = [

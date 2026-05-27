@@ -75,8 +75,8 @@ class SessionManager:
 
         now = time.time()
 
-        max_age = policy.get("max_session_age", 0)
-        reauth_interval = policy.get("reauth_interval", 0)
+        max_age = policy.get("session_max_age", 0)
+        reauth_interval = policy.get("session_reauth_interval", 0)
 
         if max_age > 0 and now - session["created_at"] > max_age:
             self.logger.info(
@@ -121,7 +121,7 @@ class SessionManager:
             return False
 
         now = time.time()
-        timeout = policy["idle_timeout"]
+        timeout = policy.get("session_idle_timeout", 0)
 
         if timeout > 0 and now - session["last_seen"] > timeout:
             self.logger.info("DROP REASON: session idle timeout src=%s dst=%s", src, dst)
@@ -164,7 +164,7 @@ class SessionManager:
             return False
 
         now = time.time()
-        timeout = policy["idle_timeout"]
+        timeout = policy.get("session_idle_timeout", 0)
 
         orig_src, orig_dst, _, orig_src_port, orig_dst_port = key
 
@@ -185,7 +185,7 @@ class SessionManager:
                 policy (dict): policy configuration
         """
         now = time.time()
-        timeout = policy["idle_timeout"]
+        timeout = policy.get("session_idle_timeout", 0)
 
         if timeout == 0:
             return

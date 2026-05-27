@@ -72,8 +72,8 @@ class FlowManager:
 
         actions = [parser.OFPActionOutput(out_port)]
         policy = self.policy_getter()
-        idle_timeout = policy["idle_timeout"]
-        hard_timeout = policy["hard_timeout"]
+        idle_timeout = policy["flow_idle_timeout"]
+        hard_timeout = policy["flow_hard_timeout"]
 
         self.add_flow(
             datapath=datapath,
